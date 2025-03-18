@@ -34,7 +34,7 @@ Your **custom code implementation** should be placed in the `src/` folder.
 - A simple example is provided by implementing [this tutorial](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html).  
 - Adapt this code to implement your use case.  
 
-For library documentation and available functions, refer to [this guide](todo).  
+For library documentation and available functions, refer to [this guide](https://viscom-ulm.github.io/DeepEM/documentation.html).  
 
 ### Model Configuration  
 
