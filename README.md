@@ -77,7 +77,7 @@ conda env update --file environment.yml --prune
 ```
 
 #### Pip
-When working with `pip`, please make sure you have a compatible python version installed. The `deepEM` library was tested on `python == 3.12.5` with `cuda==11.8`/`12.1` and `cudnn9`.
+When working with `pip`, please make sure you have a compatible python version installed. The `deepEM` library was tested on `python == 3.12.5`/`3.11.9` with `cuda==12.1`/`11.8` and `cudnn9`.
 Next, you can run
 ```bash
 pip install -r requirements.txt
