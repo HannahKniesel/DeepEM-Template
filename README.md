@@ -2,7 +2,11 @@
 
 This template provides guidelines for contributing your work to the **DeepEM Playground**. 
 
-## Jupyter Notebooks  
+
+
+## Overview
+
+### Jupyter Notebooks  
 
 Each use case consists of two main notebooks:  
 
@@ -19,7 +23,7 @@ To assist you:
 
 Before submitting your use case, **please remove all color formatting**.  
 
-## Project Structure  
+### Project Structure  
 
 The **`deepEM/`** folder contains a lightweight library for implementing your use case.  
 - Only modify this library if absolutely necessary.  
@@ -32,7 +36,7 @@ Your **custom code implementation** should be placed in the `src/` folder.
 
 For library documentation and available functions, refer to [this guide](todo).  
 
-## Model Configuration  
+### Model Configuration  
 
 The **DeepEM** library manages model parameters through a configuration file:  
 
@@ -46,3 +50,45 @@ The **DeepEM** library manages model parameters through a configuration file:
 All parameters—both **tunable and non-tunable**—must be **well-documented**.  
 
 For detailed documentation, see **`configs/README.md`**.  
+
+## Setup 
+For a quick setup, we offer the use of `conda`, `pip` or `docker`. This will provide all needed libraries as well as common libraries used for deep learning (for more details you can check `requirements.txt`). Of course you are free to install additional dependencies, if needed.  
+
+### Conda (LightningAI)
+On your machine, run:
+```bash
+conda env create -f environment.yml
+conda activate deepEM
+```
+
+If you are working on [LightingAI](https://lightning.ai/) Studios, there will be a base environment, which you can update with the needed dependencies, by running: 
+```bash
+conda env update --file environment.yml --prune
+```
+
+### Pip
+When working with `pip`, please make sure you have a compatible python version installed. The `deepEM` library was tested on `python == 3.12.5` with `cuda==11.8`/`12.1` and `cudnn9`.
+Next, you can run
+```bash
+pip install -r requirements.txt
+```
+
+### Docker
+Build your own image with: 
+```bash 
+docker build -t deepem .
+```
+This will generate a docker image called `deepem`. 
+
+or use the existing docker image from `hannahkniesel/deepem`. 
+
+Start the docker with this command: 
+```bash
+docker run --gpus all -it -p 8888:8888 --rm --ipc=host -v /local_dir/:/workspace/ --name <container-name> <image-name> bash
+```
+
+Inside the container start `jupyter notebook`
+```bash
+jupyter notebook --ip 0.0.0.0 --no-browser --allow-root
+```
+

@@ -120,12 +120,14 @@ class Inference(AbstractInference):
         )
         
         with torch.no_grad():
-            for idx, img in enumerate(dataloader):
+            index = 0
+            for img in dataloader:
                 img = img.to(self.device)
                 outputs = self.model(img).detach().cpu()
                 _, predicted = torch.max(outputs, 1)
                 prediction = [{"image": i.squeeze().cpu(), "prediction": self.metadata["class_names"][p]} for i,p in zip(img,predicted)]
-                [self.save_prediction(p,  os.path.join(self.save_to, f"prediction_{str(idx).zfill(4)}")) for p in prediction]
+                [self.save_prediction(p,  os.path.join(self.save_to, f"prediction_{str(index+i).zfill(4)}")) for i,p in enumerate(prediction)]
+                index += img.shape[0]
         return 
         
 
@@ -142,7 +144,7 @@ class Inference(AbstractInference):
         """
         fig = plt.figure()
         plt.imshow(self.min_max_norm(prediction["image"].permute(1,2,0)))
-        plt.title(f"Prediction: {prediction["prediction"]}")
+        plt.title(f"Prediction: {prediction['prediction']}")
         plt.axis("off")
         plt.tight_layout()
         plt.savefig(f"{save_file}.jpg")
