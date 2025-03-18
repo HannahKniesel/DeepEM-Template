@@ -51,10 +51,20 @@ All parameters—both **tunable and non-tunable**—must be **well-documented**.
 
 For detailed documentation, see **`configs/README.md`**.  
 
-## Setup 
+## Setup
+
+### Lightning AI
+<a target="_blank" href="https://lightning.ai/hannah-kniesel/studios/deepem-template">
+  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg"
+    alt="Open in Lightning AI Studios" />
+</a>
+
+Start immediately using the Lightning AI Studio template by clicking the button above—no additional setup required.
+
+### Local Setup 
 For a quick setup, we offer the use of `conda`, `pip` or `docker`. This will provide all needed libraries as well as common libraries used for deep learning (for more details you can check `requirements.txt`). Of course you are free to install additional dependencies, if needed.  
 
-### Conda (LightningAI)
+#### Conda (LightningAI)
 On your machine, run:
 ```bash
 conda env create -f environment.yml
@@ -66,14 +76,14 @@ If you are working on [LightingAI](https://lightning.ai/) Studios, there will be
 conda env update --file environment.yml --prune
 ```
 
-### Pip
+#### Pip
 When working with `pip`, please make sure you have a compatible python version installed. The `deepEM` library was tested on `python == 3.12.5` with `cuda==11.8`/`12.1` and `cudnn9`.
 Next, you can run
 ```bash
 pip install -r requirements.txt
 ```
 
-### Docker
+#### Docker
 Build your own image with: 
 ```bash 
 docker build -t deepem .
