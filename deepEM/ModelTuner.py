@@ -22,7 +22,6 @@ class ModelTuner(ABC):
 
     Attributes:
         model_trainer: An instance of the model trainer to train and evaluate the model.
-        data_path: Path to the dataset.
         logger: Logger instance to record the training and evaluation process.
         config: Configuration dictionary loaded from a JSON file.
         trainsubset: Proportion of the dataset to use for training.
@@ -30,25 +29,23 @@ class ModelTuner(ABC):
         method: The method used for hyperparameter tuning (grid, random, or bayes).
     """
 
-    def __init__(self, model_trainer, data_path, logger):
+    def __init__(self, model_trainer, logger):
         """
         Initializes the ModelTuner with the necessary components.
 
         Args:
             model_trainer: An instance of the model trainer class.
-            data_path: Path to the training data.
             logger: Logger instance to log information.
         """
         self.model_trainer = model_trainer
-        self.data_path = data_path
         self.logger = logger
         self.config = self.load_config(os.path.join(config_dir,"parameters.json"))
         self.trainsubset = float(self.config["train_subset"])
         self.reduce_epochs = float(self.config["reduce_epochs"])
         self.method = self.config["method"]
         
-        if(self.method not in ["grid", "random", "bayes"]):
-            self.logger.log_warning(f"Method {self.method} is not in default methods. Please provide one of 'grid', 'random', 'bayes'.")
+        if(self.method not in ["grid"]):
+            self.logger.log_warning(f"Method {self.method} is not in default methods. Please provide 'grid'.")
 
     def edit_hyperparameters(self):
         """
