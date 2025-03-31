@@ -3,7 +3,6 @@ import os
 import torch
 from torch.utils.data import DataLoader
 import xml.etree.ElementTree as ET
-from pytorch_grad_cam import GradCAM
 import matplotlib.pyplot as plt
 from PIL import Image
 import io
@@ -146,7 +145,7 @@ class ModelTrainer(AbstractModelTrainer):
         return criterion(outputs, targets)
         
 
-    def train_step(self, batch):
+    def train_step(self, batch_idx, batch):
         """
         Perform one training step.
 
@@ -232,7 +231,7 @@ class ModelTrainer(AbstractModelTrainer):
         return metrics
         
 
-    def val_step(self, batch):
+    def val_step(self, batch_idx, batch):
         """
         Perform one validation step.
 
@@ -252,7 +251,7 @@ class ModelTrainer(AbstractModelTrainer):
         return loss.item(), metrics
         
 
-    def test_step(self, batch):
+    def test_step(self, batch_idx, batch):
         """
         Perform one test step.
 
@@ -265,6 +264,6 @@ class ModelTrainer(AbstractModelTrainer):
             
         """
         # Implementation could look like this:
-        return self.val_step(batch)
+        return self.val_step(batch_idx, batch)
 
     
