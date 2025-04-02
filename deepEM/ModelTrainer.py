@@ -277,7 +277,6 @@ class AbstractModelTrainer(ABC):
         # metadata = {}
         # metadata["class_names"] = ["class1", "class2"]
         # return metadata
-        # `return jit_model` 
         raise NotImplementedError("The 'inference_metadata' method must be implemented by the DL specialist.")
         
             
@@ -383,13 +382,6 @@ class AbstractModelTrainer(ABC):
         
             # Save model, optimizer, and scheduler state
             torch.save(checkpoint, checkpoint_path)
-
-            
-            # Save scripted model for easier exchange of model for inference. 
-            checkpoint_path = os.path.join(self.logger.checkpoints_dir, "model_scripted.pt")
-            self.model.eval()
-            scripted_model = torch.jit.script(self.model)
-            scripted_model.save(checkpoint_path)
             
         else:
             self.patience_counter += 1
@@ -590,7 +582,7 @@ class AbstractModelTrainer(ABC):
             if self.scheduler and (self.parameter['scheduler_step_by'] == "epoch"):
                 self.scheduler.step()
         self.logger.plot_training_curves(train_loss_history, train_epoch, val_loss_history, val_epoch, show = True)
-        self.logger.log_info(f"Finished training. Find logs and model checkpoints at: {self.logger.log_dir}\n")
+        self.logger.log_info(f"Finished training. Find logs and model checkpoints at: {self.logger.log_dir}")
         return np.min(val_loss_history)
 
 
