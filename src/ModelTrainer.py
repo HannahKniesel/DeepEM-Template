@@ -46,7 +46,7 @@ class ModelTrainer(AbstractModelTrainer):
         Returns:
             model (lib.Model.AbstractModel): The dataloader for the training dataset.
         """
-        return Model()
+        return Model().to(self.device)
 
     
     def inference_metadata(self):

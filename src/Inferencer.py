@@ -19,7 +19,7 @@ from src.Model import Model
 class SimpleDataset(Dataset):
     
     def __init__(self, data_path):
-        self.image_extensions = {".jpg", ".jpeg", ".png"}
+        self.image_extensions = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
         
         if(self.is_image_file(data_path)):
@@ -71,7 +71,7 @@ class Inference(AbstractInference):
         Returns: 
             torch.nn.Module: the model
         """
-        return Model()
+        return Model().to(self.device)
      
     
     def predict_single(self) -> Any:
