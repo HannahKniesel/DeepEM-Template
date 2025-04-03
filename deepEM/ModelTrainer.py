@@ -46,7 +46,7 @@ class AbstractModelTrainer(ABC):
         self.set_epochs()
         self.finetuning = False
             
-    def prepare(self, config=None, train_subset=None, reduce_epochs=None, set_parameters = True):
+    def prepare(self, config=None, train_subset=None, reduce_epochs=None, num_epochs=None, set_parameters = True):
         if(set_parameters):
             if(not config):
                 hyperparameters = load_json(os.path.join(config_dir,"parameters.json"))
@@ -71,6 +71,8 @@ class AbstractModelTrainer(ABC):
         
         # setup number of training epochs 
         self.set_epochs()
+        if(num_epochs is not None):
+            self.num_epochs = num_epochs
         
         # Set up optimizer and scheduler
         self.optimizer, self.scheduler = self.setup_optimizer()
@@ -398,13 +400,16 @@ class AbstractModelTrainer(ABC):
         
         checkpoint = torch.load(checkpoint_path)
         self.parameter = checkpoint['parameter']
-        self.prepare(set_parameters=False)
-        
+        self.prepare(set_parameters=False, num_epochs=self.num_epochs)
         
         self.model.load_state_dict(checkpoint['model_state_dict'])
 
         if(not finetuning):
-            self.save_checkpoint(checkpoint['epoch'], checkpoint['val_loss'])
+            try:
+                # should only save when training was done. Does not save model checkpoint to evaluate. 
+                self.save_checkpoint(checkpoint['epoch'], checkpoint['val_loss'])
+            except: 
+                pass
 
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             if self.scheduler and checkpoint['scheduler_state_dict']:
@@ -413,13 +418,18 @@ class AbstractModelTrainer(ABC):
             self.best_val_loss = checkpoint['val_loss']
             self.patience_counter = 0  # Reset patience counter
             self.start_epoch = checkpoint['epoch']
+            remaining_epochs = self.num_epochs - self.start_epoch
+            if(remaining_epochs < 0):
+                self.logger.log_warning(f"Current number of training epochs ({self.num_epochs}) is smaller than last epoch of the loaded model ({self.start_epoch}). Will train the model for {self.num_epochs} epochs.")
+                self.start_epoch = 0
             self.logger.log_info(f"Resumed training from checkpoint: {checkpoint_path} (Validation Loss: {self.best_val_loss:.4f}) | Remaining epochs: {self.num_epochs - self.start_epoch}")
                         
         else: 
             self.start_epoch = 0
             self.logger.log_info(f"Loaded model checkpoint for finetuning from: {checkpoint_path} (Validation Loss: {self.best_val_loss:.4f})")
             
-        
+        self.model.to(self.device)
+
         
 
     def train_epoch(self, epoch):
@@ -453,7 +463,7 @@ class AbstractModelTrainer(ABC):
         # Validation loop
         
         with torch.no_grad():            
-            if((epoch % self.validation_interval) == 0):
+            if(((epoch % self.validation_interval) == 0) or (epoch == (self.num_epochs-1))):
                 val_loss = 0.0
                 self.model.eval()
                 self.qualify(self.val_vis_loader, f"validation_epoch-{epoch}")
@@ -492,14 +502,12 @@ class AbstractModelTrainer(ABC):
         """
         Run the test loop after training.
         """
-        self.logger.init(f"Evaluate")
-        self.logger.init_directories()
         if(evaluate_on_full):
             # reinit dataset with no train/test_split
             combined_dataset = ConcatDataset([self.train_loader.dataset, self.val_loader.dataset, self.test_loader.dataset])
             combined_dataloader = DataLoader(combined_dataset, batch_size=self.test_loader.batch_size, shuffle=False)
             self.test_loader = combined_dataloader
-            self.logger.print_info(f"Evaluate on full dataset with {len(combined_dataset)} samples.")
+            self.logger.log_info(f"Evaluate on full dataset with {len(combined_dataset)} samples.")
         
         self.model.to(self.device)
 
@@ -509,7 +517,7 @@ class AbstractModelTrainer(ABC):
         metrics_sum = {}  # To store the sum of metrics across batches
         num_batches = len(self.test_loader)
 
-        for batch_idx, batch in enumerate(self.test_loader):
+        for batch_idx, batch in tqdm(enumerate(self.test_loader), desc="Evaluate"):
             loss, batch_metrics = self.test_step(batch_idx, batch)
             test_loss += loss
 
