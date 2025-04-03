@@ -419,8 +419,8 @@ class AbstractModelTrainer(ABC):
             self.patience_counter = 0  # Reset patience counter
             self.start_epoch = checkpoint['epoch']
             remaining_epochs = self.num_epochs - self.start_epoch
-            if(remaining_epochs < 0):
-                self.logger.log_warning(f"Current number of training epochs ({self.num_epochs}) is smaller than last epoch of the loaded model ({self.start_epoch}). Will train the model for {self.num_epochs} epochs.")
+            if(remaining_epochs <= 0):
+                self.logger.log_warning(f"Current number of training epochs ({self.num_epochs}) is smaller or equal than last epoch of the loaded model ({self.start_epoch}). Will train the model for {self.num_epochs} epochs.")
                 self.start_epoch = 0
             self.logger.log_info(f"Resumed training from checkpoint: {checkpoint_path} (Validation Loss: {self.best_val_loss:.4f}) | Remaining epochs: {self.num_epochs - self.start_epoch}")
                         
